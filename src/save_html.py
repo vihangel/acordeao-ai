@@ -47,7 +47,10 @@ for i, link in enumerate(links_faltando, 1):
 
         # Espera carregar conteúdo relevante
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//*[contains(translate(text(), "Isto posto", "Isto posto"), "Isto posto")]'))
+            EC.presence_of_element_located((
+            By.XPATH,
+            '//*[contains(translate(text(), "EMENTA", "EMENTA"), "EMENTA")]'
+            ))
         )
 
         # Salva HTML
