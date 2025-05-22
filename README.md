@@ -51,9 +51,23 @@ acordeao-ai/
 
 ## Como Rodar
 
+Antes de executar os scripts, instale as dependências:
+
+```bash
+pip install -r requirements.txt
+```
+
 ### 1. Coletar Links
 
 Execute o script `scraper.py` para buscar os links de "Inteiro Teor" no site do TRT23:
+
+**No Linux/Mac:**
+
+```bash
+python3 src/scraper.py
+```
+
+**No Windows:**
 
 ```bash
 python src/scraper.py
@@ -64,6 +78,14 @@ Os links serão salvos no arquivo `data/raw/links_dispositivo_<filtro>.txt`.
 ### 2. Salvar HTMLs
 
 Com os links coletados, execute o script `save_html.py` para salvar o conteúdo HTML de cada página:
+
+**No Linux/Mac:**
+
+```bash
+python3 src/save_html.py
+```
+
+**No Windows:**
 
 ```bash
 python src/save_html.py
