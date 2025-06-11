@@ -1,45 +1,70 @@
 from bs4 import BeautifulSoup
-import json
 import os
+import json
 
-# Caminho do diretório com os HTMLs
+# === Caminho do diretório com os HTMLs ===
 html_dir = 'data/raw/html'
 html_files = [f for f in os.listdir(html_dir) if f.endswith('.html')]
 if not html_files:
     raise FileNotFoundError(f"Nenhum arquivo HTML encontrado em: {html_dir}")
 
-# Abrir o primeiro HTML (você pode adaptar depois para processar todos)
-html_path = os.path.join(html_dir, html_files[0])
-with open(html_path, 'r', encoding='utf-8') as file:
-    html_content = file.read()
+# Dicionário final por arquivo
+dados_por_arquivo = {}
 
-# Parsear o HTML
-soup = BeautifulSoup(html_content, 'html.parser')
+# Processar todos os arquivos HTML
+for html_file in html_files:
+    html_path = os.path.join(html_dir, html_file)
+    with open(html_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
 
-# Coletar os títulos das seções
-titulos_info = []
+    soup = BeautifulSoup(html_content, 'html.parser')
+    secoes_dict = {}
 
-# Encontrar todos os blocos com ID terminando em "_titulo_completo"
-titulo_completo_divs = soup.find_all("div", id=lambda x: x and x.endswith("_titulo_completo"))
+    # Encontrar todos os blocos de título
+    divs_titulo = soup.find_all("div", id=lambda x: x and "_titulo" in x)
 
-for div in titulo_completo_divs:
-    id_original = div.get("id", None)
-    titulo_texto = div.get_text(separator=" ", strip=True)
-    
-    # Apenas incluir se o título não estiver vazio
-   
-    titulos_info.append({
-        "id": id_original,
-        "titulo": titulo_texto
-    })
+    for div in divs_titulo:
+        id_titulo = div.get("id")
+        id_base = id_titulo.replace("_titulo_completo", "").replace("_titulo", "")
+        titulo = div.get_text(separator=" ", strip=True)
 
-# Exportar para JSON
-json_output = json.dumps(titulos_info, ensure_ascii=False, indent=4)
+        if not titulo:
+            continue
+
+        if id_base not in secoes_dict:
+            secoes_dict[id_base] = {
+                "id": id_titulo,
+                "titulo": titulo,
+                "conteudo": ""
+            }
+        else:
+            secoes_dict[id_base]["id"] = id_titulo
+            secoes_dict[id_base]["titulo"] = titulo
+
+    # Associar conteúdo
+    for id_base in list(secoes_dict.keys()):
+        div_conteudo = soup.find("div", id=f"{id_base}_conteudo")
+        if div_conteudo:
+            conteudo = div_conteudo.get_text(separator=" ", strip=True)
+            if conteudo:
+                secoes_dict[id_base]["conteudo"] = conteudo
+            else:
+                del secoes_dict[id_base]  # remover se conteúdo vazio
+        else:
+            del secoes_dict[id_base]  # remover se conteúdo ausente
+
+    # Adicionar ao resultado final, se houver seções válidas
+    secoes = list(secoes_dict.values())
+    if secoes:
+        nome_base = os.path.splitext(html_file)[0]  # nome do arquivo sem .html
+        dados_por_arquivo[nome_base] = secoes
+
+# === Exportar JSON final ===
 output_dir = 'data/raw/json'
 os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, 'titulos.json')
+output_path = os.path.join(output_dir, 'secoes_por_arquivo.json')
 
 with open(output_path, 'w', encoding='utf-8') as json_file:
-    json_file.write(json_output)
+    json.dump(dados_por_arquivo, json_file, ensure_ascii=False, indent=4)
 
-print(f"✅ Títulos salvos em: {output_path}")
+print(f"✅ JSON salvo em: {output_path}")
