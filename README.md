@@ -1,5 +1,69 @@
 <!-- @format -->
 
+# Agrupamento de Acórdãos com BERTopic
+
+Este repositório contém os experimentos realizados cujo objetivo é investigar a modelagem de tópicos em acórdãos trabalhistas utilizando o algoritmo BERTopic e embeddings jurídicos.
+
+## Objetivo
+
+O notebook `Agrupamento de acórdãos com BERTopic.ipynb` implementa um pipeline completo para:
+
+- Pré-processamento de acórdãos trabalhistas;
+- Extração de embeddings com modelos baseados em BERT (LegalBERT-pt);
+- Modelagem de tópicos com o algoritmo BERTopic;
+- Avaliação da coerência temática (coerência c_v);
+- Análise do balanceamento entre os tópicos com base na proporção de documentos;
+- Cálculo de métrica composta (score balanceado).
+
+## Estrutura
+
+```
+├── Agrupamento de acórdãos com BERTopic.ipynb  # Notebook principal
+├── content/acordaos/                           # Acórdãos trabalhistas em .html
+├── stopword_extras.txt                         # Stopwords customizadas
+```
+
+> Os arquivos de entrada (`.html`) foram coletados do site do TRT-23.
+
+## Requisitos
+
+Instale os pacotes necessários com:
+
+```bash
+pip install -r requirements.txt
+```
+
+Pacotes principais:
+
+- `bertopic`
+- `sentence-transformers`
+- `umap-learn`
+- `nltk`
+- `pandas`, `matplotlib`, `seaborn`
+- `gensim`
+
+## ▶️ Execução
+
+1. Coloque os arquivos `.html` dos acórdãos no diretório `content/acordaos/`.
+2. Abra o notebook:  
+   `Agrupamento de acórdãos com BERTopic.ipynb`
+3. Execute célula por célula para reproduzir o pipeline completo.
+
+## Métricas
+
+Além da coerência temática (c_v), foi proposto um **score balanceado**:
+
+```
+Diversidade = 1 − (Qtd. documentos no maior tópico / Qtd. total de documentos)
+Score balanceado = Coerência_c_v × Diversidade
+```
+
+Essa métrica permite avaliar modelos que sejam semanticamente coerentes e distributivamente equilibrados.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT. Sinta-se à vontade para usar, modificar e citar este repositório, especialmente para fins acadêmicos.
+
 # Acordeão Scrapper
 
 Este projeto utiliza **Selenium** para automatizar a coleta de dados de jurisprudência no site do TRT23 e salvar os resultados em arquivos HTML. Ele é dividido em dois scripts principais:
